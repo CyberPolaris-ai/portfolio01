@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ワリカン上手</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    font-family: "Yu Gothic UI", "Meiryo", system-ui, sans-serif;
+    background: #fff;
+    color: #222;
+    margin: 20px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 22px;
+    font-weight: 600;
+    margin: 8px 0 16px;
+  }
+  .app {
+    max-width: 780px;
+    margin: 0 auto;
+  }
+  fieldset {
+    border: 1px solid #555;
+    border-radius: 2px;
+    padding: 18px 24px;
+    margin-bottom: 0;
+  }
+  fieldset legend {
+    padding: 0 8px;
+    font-size: 14px;
+    color: #222;
+  }
+  .row {
+    display: grid;
+    grid-template-columns: 80px 180px 1fr;
+    align-items: center;
+    gap: 10px 14px;
+    margin: 8px 0;
+  }
+  .label { font-size: 14px; }
+  .input-cell {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  input[type="number"] {
+    width: 110px;
+    text-align: right;
+    font-size: 15px;
+    padding: 4px 6px;
+    border: 1px solid #888;
+    border-radius: 2px;
+    font-family: inherit;
+  }
+  /* Remove spinners */
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+  input[type=number] { -moz-appearance: textfield; }
+
+  .unit { font-size: 14px; }
+
+  /* Slider */
+  .slider-wrap {
+    grid-column: 2 / span 2;
+    display: grid;
+    grid-template-columns: 40px 1fr 40px;
+    align-items: center;
+    gap: 10px;
+  }
+  .slider-wrap .side-label { font-size: 14px; }
+  .slider-wrap .side-label.right { text-align: left; }
+  .slider-bar-container {
+    position: relative;
+    height: 44px;
+  }
+  .pct-labels {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-size: 12px;
+    padding: 0 8px;
+  }
+  .bar {
+    position: absolute;
+    bottom: 6px;
+    left: 0; right: 0;
+    height: 18px;
+    display: flex;
+    border: 1px solid #333;
+  }
+  .bar .male { background: #2d4e8a; height: 100%; }
+  .bar .female { background: #e8a87c; height: 100%; }
+  input[type="range"] {
+    position: absolute;
+    bottom: 0;
+    left: -2px;
+    right: -2px;
+    width: calc(100% + 4px);
+    height: 30px;
+    background: transparent;
+    -webkit-appearance: none;
+    appearance: none;
+    margin: 0;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 18px;
+    background: transparent;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: #fff;
+    border: 1px solid #222;
+    border-radius: 0;
+    transform: rotate(45deg);
+    margin-top: 0;
+    cursor: pointer;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 18px; height: 18px;
+    background: #fff;
+    border: 1px solid #222;
+    border-radius: 0;
+    transform: rotate(45deg);
+    cursor: pointer;
+  }
+
+  /* Result section */
+  .result-title {
+    text-align: center;
+    font-size: 14px;
+    margin: 18px 0 10px;
+  }
+  .result-grid {
+    display: grid;
+    grid-template-columns: 120px 110px 40px 80px 110px 40px;
+    row-gap: 10px;
+    column-gap: 8px;
+    align-items: center;
+    font-size: 14px;
+  }
+  .result-grid .val {
+    text-align: right;
+    font-size: 15px;
+    padding: 4px 8px;
+    border: 1px solid #888;
+    border-radius: 2px;
+    background: #fff;
+    min-height: 28px;
+  }
+  .spacer { grid-column: 1 / span 3; }
+
+  .radio-group { display: flex; gap: 18px; align-items: center; }
+  .radio-group label { font-size: 14px; cursor: pointer; display: inline-flex; align-items: center; gap: 4px; }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>ワリカン上手</h1>
+
+  <fieldset>
+    <legend>入力してください</legend>
+
+    <div class="row">
+      <div class="label">会計金額</div>
+      <div class="input-cell">
+        <input type="number" id="total" value="136783" min="0" step="1">
+        <span class="unit">円</span>
+      </div>
+      <div class="label" style="padding-left:8px;">負担割合スライド</div>
+    </div>
+
+    <div class="row">
+      <div class="label">男性</div>
+      <div class="input-cell">
+        <input type="number" id="men" value="16" min="0" step="1">
+        <span class="unit">人</span>
+      </div>
+      <div class="slider-wrap" style="grid-column: 3 / span 1;">
+        <div class="side-label">男性</div>
+        <div class="slider-bar-container">
+          <div class="pct-labels">
+            <span id="pctMen">100 %</span>
+            <span id="pctWomen">100 %</span>
+          </div>
+          <div class="bar">
+            <div class="male" id="barMen" style="width:50%"></div>
+            <div class="female" id="barWomen" style="width:50%"></div>
+          </div>
+          <input type="range" id="slider" min="40" max="160" step="1" value="100">
+        </div>
+        <div class="side-label right">女性</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="label">女性</div>
+      <div class="input-cell">
+        <input type="number" id="women" value="5" min="0" step="1">
+        <span class="unit">人</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:16px;">
+        <span class="label">丸め</span>
+        <div class="radio-group">
+          <label><input type="radio" name="unit" value="100" checked> 100円単位</label>
+          <label><input type="radio" name="unit" value="10"> 10円単位</label>
+        </div>
+      </div>
+    </div>
+  </fieldset>
+
+  <div class="result-title">計算結果</div>
+
+  <div class="result-grid">
+    <div>男性一人当たり</div>
+    <div class="val" id="menPer"></div>
+    <div>円</div>
+    <div style="text-align:right;">男性合計</div>
+    <div class="val" id="menTotal"></div>
+    <div>円</div>
+
+    <div>女性一人当たり</div>
+    <div class="val" id="womenPer"></div>
+    <div>円</div>
+    <div style="text-align:right;">女性合計</div>
+    <div class="val" id="womenTotal"></div>
+    <div>円</div>
+
+    <div class="spacer"></div>
+    <div style="text-align:right;">端数</div>
+    <div class="val" id="hasu"></div>
+    <div>円</div>
+
+    <div class="spacer"></div>
+    <div style="text-align:right;">合計金額</div>
+    <div class="val" id="sumTotal"></div>
+    <div>円</div>
+  </div>
+</div>
+
+<script>
+  const $ = (id) => document.getElementById(id);
+  const fmt = (n) => (n == null || Number.isNaN(n)) ? "" : Number(n).toLocaleString("ja-JP");
+
+  function roundUnit(value, unit, dir) {
+    return dir === 'floor'
+      ? Math.floor(value / unit) * unit
+      : Math.ceil(value / unit) * unit;
+  }
+
+  function getUnit() {
+    const r = document.querySelector('input[name="unit"]:checked');
+    return r ? Number(r.value) : 100;
+  }
+
+  function recalc() {
+    const total = Math.max(0, Math.floor(Number($('total').value) || 0));
+    const M = Math.max(0, Math.floor(Number($('men').value) || 0));
+    const W = Math.max(0, Math.floor(Number($('women').value) || 0));
+    const s = Number($('slider').value);
+    const unit = getUnit();
+
+    // Update slider visuals
+    const mPct = s;
+    const wPct = 200 - s;
+    $('pctMen').textContent = mPct + ' %';
+    $('pctWomen').textContent = wPct + ' %';
+    // Bar widths: map slider 40..160 to male width proportion.
+    // At s=100 → 50/50. Push proportionally: maleWidth% = s/2
+    const maleW = s / 2; // 20..80
+    $('barMen').style.width = maleW + '%';
+    $('barWomen').style.width = (100 - maleW) + '%';
+
+    // Clear if invalid
+    if (total <= 0 || (M + W) === 0) {
+      ['menPer','womenPer','menTotal','womenTotal','hasu','sumTotal'].forEach(id => $(id).textContent = '');
+      return;
+    }
+
+    const mRatio = s / 100;
+    // const wRatio = (200 - s) / 100; // not used directly; women derived from remainder
+
+    const avg = total / (M + W);
+    const menRaw = avg * mRatio;
+
+    const dirs = ['floor', 'ceil'];
+    let best = null;
+
+    for (const mDir of (M > 0 ? dirs : ['floor'])) {
+      const menPer = M > 0 ? roundUnit(menRaw, unit, mDir) : 0;
+      const menTotal = menPer * M;
+      const rest = total - menTotal;
+      const womenRaw = W > 0 ? rest / W : 0;
+      for (const wDir of (W > 0 ? dirs : ['floor'])) {
+        const womenPer = W > 0 ? roundUnit(womenRaw, unit, wDir) : 0;
+        const womenTotal = womenPer * W;
+        const hasu = total - menTotal - womenTotal;
+        if (hasu < 0) continue;
+        // Also disallow negative per-person values
+        if (menPer < 0 || womenPer < 0) continue;
+        if (best === null || hasu < best.hasu) {
+          best = { menPer, menTotal, womenPer, womenTotal, hasu };
+        }
+      }
+    }
+
+    // Fallback: if nothing found (shouldn't happen because all-floor always yields hasu>=0)
+    if (best === null) {
+      const menPer = M > 0 ? roundUnit(menRaw, unit, 'floor') : 0;
+      const menTotal = menPer * M;
+      const rest = total - menTotal;
+      const womenPer = W > 0 ? roundUnit(rest / W, unit, 'floor') : 0;
+      const womenTotal = womenPer * W;
+      const hasu = total - menTotal - womenTotal;
+      best = { menPer, menTotal, womenPer, womenTotal, hasu };
+    }
+
+    const sum = best.menTotal + best.womenTotal + best.hasu;
+
+    $('menPer').textContent = M > 0 ? fmt(best.menPer) : '';
+    $('womenPer').textContent = W > 0 ? fmt(best.womenPer) : '';
+    $('menTotal').textContent = fmt(best.menTotal);
+    $('womenTotal').textContent = fmt(best.womenTotal);
+    $('hasu').textContent = fmt(best.hasu);
+    $('sumTotal').textContent = fmt(sum);
+  }
+
+  ['total','men','women','slider'].forEach(id => {
+    $(id).addEventListener('input', recalc);
+    $(id).addEventListener('change', recalc);
+  });
+  document.querySelectorAll('input[name="unit"]').forEach(el => {
+    el.addEventListener('change', recalc);
+  });
+
+  recalc();
+</script>
+</body>
+</html>

@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Color Viewer</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: "Segoe UI", "Meiryo", sans-serif; font-size: 13px; background: #e8e8e8; }
+
+.app-container {
+  display: flex;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border: 2px solid #333;
+  background: #f0f0f0;
+}
+
+/* === Left Column: Color Viewer === */
+.viewer-column {
+  width: 300px;
+  min-width: 300px;
+  border-right: 2px solid #333;
+  display: flex;
+  flex-direction: column;
+}
+.viewer-title {
+  background: #2a3a5c;
+  color: #ccc;
+  text-align: center;
+  padding: 4px;
+  font-weight: bold;
+  border-bottom: 1px solid #333;
+}
+.color-bars {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.color-bar {
+  height: 36px;
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.color-bar-label {
+  position: absolute;
+  left: 8px;
+  font-size: 12px;
+  color: #333;
+  font-weight: bold;
+  text-shadow: 0 0 3px rgba(255,255,255,0.8);
+  z-index: 1;
+}
+.circles-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 15px;
+}
+#circles-canvas {
+  border: 1px solid #999;
+  background: #fff;
+}
+
+/* === Right Column: Panels === */
+.panels-column {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+}
+.color-panel {
+  border: 1px solid #333;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-title {
+  background: #2a3a5c;
+  color: #f0c040;
+  text-align: center;
+  padding: 3px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+/* Picker area */
+.picker-row {
+  display: flex;
+  padding: 4px;
+  gap: 2px;
+  background: #ddd;
+}
+.spectrum-canvas {
+  cursor: crosshair;
+  border: 1px solid #666;
+  width: 200px;
+  height: 100px;
+}
+.brightness-wrap {
+  position: relative;
+  width: 36px;
+  min-width: 36px;
+  flex-shrink: 0;
+  height: 100px;
+  cursor: ns-resize;
+}
+.brightness-canvas {
+  cursor: pointer;
+  border: 1px solid #666;
+  width: 24px;
+  height: 100%;
+}
+.brightness-marker {
+  position: absolute;
+  right: -6px;
+  font-size: 14px;
+  line-height: 1;
+  cursor: ns-resize;
+  transform: translateY(-50%);
+  color: #333;
+  top: 0;
+}
+
+/* Crosshair on spectrum */
+.spectrum-wrap {
+  position: relative;
+  width: 200px;
+  height: 100px;
+}
+.crosshair {
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  border: 2px solid #fff;
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 2px rgba(0,0,0,0.8);
+}
+
+/* Controls */
+.controls {
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  background: #e4e4e4;
+}
+.control-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.control-row label {
+  width: 110px;
+  text-align: right;
+  white-space: nowrap;
+  font-size: 12px;
+}
+.control-row input[type="number"] {
+  width: 52px;
+  text-align: right;
+  font-size: 12px;
+  padding: 1px 2px;
+}
+.control-row input[type="text"] {
+  width: 70px;
+  font-size: 12px;
+  padding: 1px 2px;
+  font-family: monospace;
+}
+.control-row select {
+  width: 80px;
+  font-size: 12px;
+}
+.spinner-btns {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  line-height: 1;
+}
+.spinner-btn {
+  cursor: pointer;
+  font-size: 8px;
+  padding: 0 2px;
+  background: #ddd;
+  border: 1px solid #999;
+  line-height: 1;
+  user-select: none;
+}
+.spinner-btn:hover { background: #bbb; }
+.spinner-btn:active { background: #999; }
+
+/* Hide number input native spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type="number"] { -moz-appearance: textfield; }
+
+.copyright {
+  max-width: 1000px;
+  margin: 4px auto 0;
+  text-align: right;
+  font-size: 12px;
+  color: #666;
+}
+</style>
+</head>
+<body>
+
+<div class="app-container">
+  <!-- Left Column -->
+  <div class="viewer-column">
+    <div class="viewer-title">Color Palette Viewer</div>
+    <div class="color-bars" id="color-bars"></div>
+    <div class="circles-container">
+      <canvas id="circles-canvas" width="260" height="260"></canvas>
+    </div>
+  </div>
+  <!-- Right Column -->
+  <div class="panels-column" id="panels-column"></div>
+</div>
+<div class="copyright">&copy; 2026 Cyber Polaris</div>
+
+<script>
+// === Color Conversion Utilities ===
+function clamp(v, min, max) { return Math.max(min, Math.min(max, v)); }
+
+function rgbToHex(r, g, b) {
+  return '#' + [r, g, b].map(v => clamp(Math.round(v), 0, 255).toString(16).padStart(2, '0')).join('').toUpperCase();
+}
+
+function hexToRgb(hex) {
+  hex = hex.replace(/^#/, '');
+  if (hex.length === 3) hex = hex[0]+hex[0]+hex[1]+hex[1]+hex[2]+hex[2];
+  if (hex.length !== 6) return null;
+  const n = parseInt(hex, 16);
+  if (isNaN(n)) return null;
+  return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+}
+
+function rgbToHsv(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b), d = max - min;
+  let h = 0, s = max === 0 ? 0 : d / max, v = max;
+  if (d !== 0) {
+    if (max === r) h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return { h, s, v };
+}
+
+function hsvToRgb(h, s, v) {
+  h = ((h % 360) + 360) % 360;
+  const c = v * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = v - c;
+  let r, g, b;
+  if (h < 60)       { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else              { r = c; g = 0; b = x; }
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255)
+  };
+}
+
+function rgbToHsl(r, g, b) {
+  r /= 255; g /= 255; b /= 255;
+  const max = Math.max(r, g, b), min = Math.min(r, g, b);
+  let h = 0, s = 0, l = (max + min) / 2;
+  if (max !== min) {
+    const d = max - min;
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+    if (max === r) h = ((g - b) / d + 6) % 6;
+    else if (max === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60;
+  }
+  return { h, s: Math.round(s * 255), l: Math.round(l * 255) };
+}
+
+function hslToRgb(h, s255, l255) {
+  const s = s255 / 255, l = l255 / 255;
+  h = ((h % 360) + 360) % 360;
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs((h / 60) % 2 - 1));
+  const m = l - c / 2;
+  let r, g, b;
+  if (h < 60)       { r = c; g = x; b = 0; }
+  else if (h < 120) { r = x; g = c; b = 0; }
+  else if (h < 180) { r = 0; g = c; b = x; }
+  else if (h < 240) { r = 0; g = x; b = c; }
+  else if (h < 300) { r = x; g = 0; b = c; }
+  else              { r = c; g = 0; b = x; }
+  return {
+    r: Math.round((r + m) * 255),
+    g: Math.round((g + m) * 255),
+    b: Math.round((b + m) * 255)
+  };
+}
+
+// === State ===
+const defaultColors = [
+  { r: 169, g: 208, b: 142 }, // Col1 - light green
+  { r: 191, g: 143, b: 0   }, // Col2 - gold
+  { r: 47,  g: 117, b: 181 }, // Col3 - blue
+  { r: 255, g: 0,   b: 0   }, // Col4 - red
+];
+
+const panels = [];
+
+// === ColorPanel Class ===
+class ColorPanel {
+  constructor(index) {
+    this.index = index;
+    this.mode = index === 1 || index === 2 ? 'hsl' : 'rgb'; // Match screenshot defaults
+    this._updating = false;
+
+    // Set initial color from defaults
+    const dc = defaultColors[index];
+    this.r = dc.r; this.g = dc.g; this.b = dc.b;
+    const hsv = rgbToHsv(dc.r, dc.g, dc.b);
+    this.hue = hsv.h;
+    this.sat = hsv.s;
+    this.val = hsv.v;
+
+    // Separate HSL storage to preserve H/S when L=0 or S=0
+    const hsl = rgbToHsl(dc.r, dc.g, dc.b);
+    this.hslH = Math.round(hsl.h);
+    this.hslS = hsl.s;
+    this.hslL = hsl.l;
+
+    this.el = this._buildDOM();
+    this._setupEvents();
+  }
+
+  _buildDOM() {
+    const panel = document.createElement('div');
+    panel.className = 'color-panel';
+
+    const title = document.createElement('div');
+    title.className = 'panel-title';
+    title.textContent = 'Col' + (this.index + 1);
+    panel.appendChild(title);
+
+    // Picker row
+    const pickerRow = document.createElement('div');
+    pickerRow.className = 'picker-row';
+
+    // Spectrum
+    const specWrap = document.createElement('div');
+    specWrap.className = 'spectrum-wrap';
+    this.spectrumCanvas = document.createElement('canvas');
+    this.spectrumCanvas.className = 'spectrum-canvas';
+    this.spectrumCanvas.width = 200;
+    this.spectrumCanvas.height = 100;
+    specWrap.appendChild(this.spectrumCanvas);
+
+    this.crosshair = document.createElement('div');
+    this.crosshair.className = 'crosshair';
+    specWrap.appendChild(this.crosshair);
+    pickerRow.appendChild(specWrap);
+
+    // Brightness slider
+    const bWrap = document.createElement('div');
+    bWrap.className = 'brightness-wrap';
+    this.brightnessCanvas = document.createElement('canvas');
+    this.brightnessCanvas.className = 'brightness-canvas';
+    this.brightnessCanvas.width = 24;
+    this.brightnessCanvas.height = 100;
+    bWrap.appendChild(this.brightnessCanvas);
+
+    this.brightnessMarker = document.createElement('div');
+    this.brightnessMarker.className = 'brightness-marker';
+    this.brightnessMarker.textContent = '◀';
+    bWrap.appendChild(this.brightnessMarker);
+    pickerRow.appendChild(bWrap);
+
+    panel.appendChild(pickerRow);
+
+    // Controls
+    const controls = document.createElement('div');
+    controls.className = 'controls';
+
+    // Mode select row
+    const modeRow = this._makeRow('カラー モデル(D):', null, 'select');
+    this.modeSelect = modeRow.querySelector('select');
+    this.modeSelect.innerHTML = '<option value="rgb">RGB</option><option value="hsl">HSL</option>';
+    this.modeSelect.value = this.mode;
+    controls.appendChild(modeRow);
+
+    // RGB inputs
+    this.rgbGroup = document.createElement('div');
+    this.rgbGroup.className = 'rgb-group';
+    const rRow = this._makeRow('赤(R):', 'r-input', 'number', 0, 255);
+    const gRow = this._makeRow('緑(G):', 'g-input', 'number', 0, 255);
+    const bRow = this._makeRow('青(B):', 'b-input', 'number', 0, 255);
+    this.rInput = rRow.querySelector('input');
+    this.gInput = gRow.querySelector('input');
+    this.bInput = bRow.querySelector('input');
+    this.rgbGroup.append(rRow, gRow, bRow);
+    controls.appendChild(this.rgbGroup);
+
+    // HSL inputs
+    this.hslGroup = document.createElement('div');
+    this.hslGroup.className = 'hsl-group';
+    const hRow = this._makeRow('色合い(U):', 'h-input', 'number', 0, 360);
+    const sRow = this._makeRow('鮮やかさ(S):', 's-input', 'number', 0, 255);
+    const lRow = this._makeRow('明るさ(L):', 'l-input', 'number', 0, 255);
+    this.hInput = hRow.querySelector('input');
+    this.sInput = sRow.querySelector('input');
+    this.lInput = lRow.querySelector('input');
+    this.hslGroup.append(hRow, sRow, lRow);
+    controls.appendChild(this.hslGroup);
+
+    // Hex row
+    const hexRow = this._makeRow('Hex(H):', 'hex-input', 'text');
+    this.hexInput = hexRow.querySelector('input');
+    controls.appendChild(hexRow);
+
+    panel.appendChild(controls);
+
+    this._updateModeVisibility();
+    return panel;
+  }
+
+  _makeRow(labelText, cls, type, min, max) {
+    const row = document.createElement('div');
+    row.className = 'control-row';
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    row.appendChild(label);
+
+    if (type === 'select') {
+      const sel = document.createElement('select');
+      row.appendChild(sel);
+    } else if (type === 'number') {
+      const inp = document.createElement('input');
+      inp.type = 'number';
+      inp.min = min;
+      inp.max = max;
+      inp.step = 1;
+      if (cls) inp.className = cls;
+      row.appendChild(inp);
+
+      const spinners = document.createElement('div');
+      spinners.className = 'spinner-btns';
+      const upBtn = document.createElement('div');
+      upBtn.className = 'spinner-btn';
+      upBtn.textContent = '▲';
+      upBtn.dataset.dir = '1';
+      const downBtn = document.createElement('div');
+      downBtn.className = 'spinner-btn';
+      downBtn.textContent = '▼';
+      downBtn.dataset.dir = '-1';
+      spinners.append(upBtn, downBtn);
+      row.appendChild(spinners);
+    } else {
+      const inp = document.createElement('input');
+      inp.type = 'text';
+      if (cls) inp.className = cls;
+      row.appendChild(inp);
+    }
+    return row;
+  }
+
+  _setupEvents() {
+    // Mode select
+    this.modeSelect.addEventListener('change', () => {
+      this.mode = this.modeSelect.value;
+      this._updateModeVisibility();
+    });
+
+    // Spectrum canvas click/drag
+    this._addDrag(this.spectrumCanvas, (x, y, w, h) => {
+      this.hue = (x / w) * 360;
+      this.sat = 1 - (y / h);
+      this._applyHSV();
+    });
+
+    // Brightness slider drag - attach to wrap so ◀ marker is also draggable
+    const bWrap = this.brightnessCanvas.parentElement;
+    this._addDrag(bWrap, (x, y, w, h) => {
+      // Use canvas height for calculation (not wrap width)
+      const canvasRect = this.brightnessCanvas.getBoundingClientRect();
+      const wrapRect = bWrap.getBoundingClientRect();
+      const canvasY = clamp(y - (canvasRect.top - wrapRect.top), 0, canvasRect.height);
+      this.val = 1 - (canvasY / canvasRect.height);
+      this._applyHSV();
+    });
+
+    // RGB inputs
+    this.rInput.addEventListener('input', () => this._onRGBInput());
+    this.gInput.addEventListener('input', () => this._onRGBInput());
+    this.bInput.addEventListener('input', () => this._onRGBInput());
+
+    // HSL inputs
+    this.hInput.addEventListener('input', () => this._onHSLInput());
+    this.sInput.addEventListener('input', () => this._onHSLInput());
+    this.lInput.addEventListener('input', () => this._onHSLInput());
+
+    // Hex input
+    this.hexInput.addEventListener('input', () => {
+      if (this._updating) return;
+      const rgb = hexToRgb(this.hexInput.value);
+      if (rgb) this._setFromRGB(rgb.r, rgb.g, rgb.b);
+    });
+
+    // Spinner buttons
+    this.el.querySelectorAll('.spinner-btn').forEach(btn => {
+      btn.addEventListener('mousedown', (e) => {
+        const dir = parseInt(btn.dataset.dir);
+        const input = btn.closest('.control-row').querySelector('input');
+        if (!input || input.type !== 'number') return;
+        input.value = clamp(parseInt(input.value || 0) + dir, parseInt(input.min), parseInt(input.max));
+        input.dispatchEvent(new Event('input'));
+        // Repeat on hold
+        let interval;
+        const timeout = setTimeout(() => {
+          interval = setInterval(() => {
+            input.value = clamp(parseInt(input.value || 0) + dir, parseInt(input.min), parseInt(input.max));
+            input.dispatchEvent(new Event('input'));
+          }, 80);
+        }, 400);
+        const stop = () => { clearTimeout(timeout); clearInterval(interval); };
+        document.addEventListener('mouseup', stop, { once: true });
+      });
+    });
+  }
+
+  _addDrag(canvas, callback) {
+    const handle = (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const x = clamp(e.clientX - rect.left, 0, rect.width);
+      const y = clamp(e.clientY - rect.top, 0, rect.height);
+      callback(x, y, rect.width, rect.height);
+    };
+    canvas.addEventListener('mousedown', (e) => {
+      handle(e);
+      const onMove = (e2) => { handle(e2); };
+      const onUp = () => { document.removeEventListener('mousemove', onMove); };
+      document.addEventListener('mousemove', onMove);
+      document.addEventListener('mouseup', onUp, { once: true });
+    });
+  }
+
+  _onRGBInput() {
+    if (this._updating) return;
+    const r = clamp(parseInt(this.rInput.value) || 0, 0, 255);
+    const g = clamp(parseInt(this.gInput.value) || 0, 0, 255);
+    const b = clamp(parseInt(this.bInput.value) || 0, 0, 255);
+    this._setFromRGB(r, g, b);
+  }
+
+  _onHSLInput() {
+    if (this._updating) return;
+    const h = clamp(parseInt(this.hInput.value) || 0, 0, 360);
+    const s = clamp(parseInt(this.sInput.value) || 0, 0, 255);
+    const l = clamp(parseInt(this.lInput.value) || 0, 0, 255);
+    // Preserve the user-entered HSL values independently
+    this.hslH = h;
+    this.hslS = s;
+    this.hslL = l;
+    const rgb = hslToRgb(h, s, l);
+    this._setFromRGB(rgb.r, rgb.g, rgb.b, true);
+  }
+
+  _setFromRGB(r, g, b, fromHSL = false) {
+    this.r = r; this.g = g; this.b = b;
+    const hsv = rgbToHsv(r, g, b);
+    // Preserve hue when saturation or value is 0
+    if (hsv.s > 0.01) this.hue = hsv.h;
+    if (hsv.v > 0.01) this.sat = hsv.s;
+    this.val = hsv.v;
+    // When NOT coming from HSL input, recompute HSL from RGB
+    if (!fromHSL) {
+      const hsl = rgbToHsl(r, g, b);
+      this.hslH = Math.round(hsl.h);
+      this.hslS = hsl.s;
+      this.hslL = hsl.l;
+    }
+    this.render();
+  }
+
+  _applyHSV() {
+    const rgb = hsvToRgb(this.hue, this.sat, this.val);
+    this.r = rgb.r; this.g = rgb.g; this.b = rgb.b;
+    // Recompute HSL from the new RGB
+    const hsl = rgbToHsl(this.r, this.g, this.b);
+    this.hslH = Math.round(hsl.h);
+    this.hslS = hsl.s;
+    this.hslL = hsl.l;
+    this.render();
+  }
+
+  _updateModeVisibility() {
+    this.rgbGroup.style.display = this.mode === 'rgb' ? '' : 'none';
+    this.hslGroup.style.display = this.mode === 'hsl' ? '' : 'none';
+  }
+
+  render() {
+    this._updating = true;
+
+    // Update inputs
+    this.rInput.value = this.r;
+    this.gInput.value = this.g;
+    this.bInput.value = this.b;
+
+    this.hInput.value = this.hslH;
+    this.sInput.value = this.hslS;
+    this.lInput.value = this.hslL;
+
+    this.hexInput.value = rgbToHex(this.r, this.g, this.b);
+
+    // Draw spectrum
+    this._drawSpectrum();
+    // Draw brightness slider
+    this._drawBrightness();
+    // Position crosshair
+    this._positionCrosshair();
+    // Position brightness marker
+    this._positionBrightnessMarker();
+
+    this._updating = false;
+
+    // Update viewer
+    updateViewer();
+  }
+
+  _drawSpectrum() {
+    const canvas = this.spectrumCanvas;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+
+    // Draw hue gradient (left to right)
+    for (let x = 0; x < w; x++) {
+      const hue = (x / w) * 360;
+      const rgb = hsvToRgb(hue, 1, 1);
+      ctx.fillStyle = `rgb(${rgb.r},${rgb.g},${rgb.b})`;
+      ctx.fillRect(x, 0, 1, h);
+    }
+
+    // White overlay (top to bottom = full saturation to no saturation)
+    const whiteGrad = ctx.createLinearGradient(0, 0, 0, h);
+    whiteGrad.addColorStop(0, 'rgba(255,255,255,0)');
+    whiteGrad.addColorStop(1, 'rgba(255,255,255,1)');
+    ctx.fillStyle = whiteGrad;
+    ctx.fillRect(0, 0, w, h);
+
+    // Black overlay for brightness
+    const darkness = 1 - this.val;
+    if (darkness > 0) {
+      ctx.fillStyle = `rgba(0,0,0,${darkness})`;
+      ctx.fillRect(0, 0, w, h);
+    }
+  }
+
+  _drawBrightness() {
+    const canvas = this.brightnessCanvas;
+    const ctx = canvas.getContext('2d');
+    const w = canvas.width, h = canvas.height;
+    ctx.clearRect(0, 0, w, h);
+
+    const fullColor = hsvToRgb(this.hue, this.sat, 1);
+    const grad = ctx.createLinearGradient(0, 0, 0, h);
+    grad.addColorStop(0, `rgb(${fullColor.r},${fullColor.g},${fullColor.b})`);
+    grad.addColorStop(1, 'rgb(0,0,0)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, w, h);
+  }
+
+  _positionCrosshair() {
+    const w = 200, h = 100;
+    const x = (this.hue / 360) * w;
+    const y = (1 - this.sat) * h;
+    this.crosshair.style.left = x + 'px';
+    this.crosshair.style.top = y + 'px';
+  }
+
+  _positionBrightnessMarker() {
+    const h = 100;
+    const y = (1 - this.val) * h;
+    this.brightnessMarker.style.top = y + 'px';
+  }
+}
+
+// === Viewer Update ===
+function updateViewer() {
+  // Update bars
+  panels.forEach((p, i) => {
+    const bar = document.getElementById('bar-' + i);
+    if (bar) bar.style.backgroundColor = rgbToHex(p.r, p.g, p.b);
+  });
+
+  // Draw concentric circles
+  const canvas = document.getElementById('circles-canvas');
+  const ctx = canvas.getContext('2d');
+  const w = canvas.width, h = canvas.height;
+  ctx.clearRect(0, 0, w, h);
+
+  const cx = w / 2, cy = h / 2;
+  const maxR = Math.min(cx, cy) - 20;
+  // Draw from outermost (Col4) to innermost (Col1)
+  const radii = [1.0, 0.75, 0.5, 0.3];
+  const order = [3, 2, 1, 0]; // Col4 first (outermost)
+
+  order.forEach((colorIdx, i) => {
+    const p = panels[colorIdx];
+    if (!p) return;
+    ctx.beginPath();
+    ctx.arc(cx, cy, maxR * radii[i], 0, Math.PI * 2);
+    ctx.fillStyle = rgbToHex(p.r, p.g, p.b);
+    ctx.fill();
+    ctx.strokeStyle = '#666';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  });
+
+  // Labels with leader lines pointing to the midpoint of each ring's left edge
+  ctx.font = '12px Meiryo, sans-serif';
+  ctx.fillStyle = '#333';
+  ctx.textAlign = 'left';
+
+  // Ring boundaries (outerRadius, innerRadius) for each Col
+  // Col1: innermost circle (0 to radii[3]), Col2: radii[3] to radii[2], etc.
+  const ringBounds = [
+    { outer: maxR * radii[3], inner: 0 },             // Col1 (innermost)
+    { outer: maxR * radii[2], inner: maxR * radii[3] }, // Col2
+    { outer: maxR * radii[1], inner: maxR * radii[2] }, // Col3
+    { outer: maxR * radii[0], inner: maxR * radii[1] }, // Col4 (outermost)
+  ];
+
+  const labelX = 10;
+  const labelStartY = cy - maxR * 0.5;
+  const labelSpacing = 22;
+
+  for (let i = 0; i < 4; i++) {
+    const text = 'Col' + (i + 1);
+    const labelY = labelStartY + i * labelSpacing;
+    ctx.fillStyle = '#333';
+    ctx.fillText(text, labelX, labelY);
+
+    // Target: midpoint of the ring on the left side of the circle
+    const ringMid = (ringBounds[i].outer + ringBounds[i].inner) / 2;
+    const targetX = cx - ringMid;
+    const targetY = cy;
+
+    // Line from end of text to target point
+    const textEndX = labelX + ctx.measureText(text).width + 3;
+    ctx.beginPath();
+    ctx.moveTo(textEndX, labelY - 4);
+    ctx.lineTo(targetX, targetY);
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.stroke();
+  }
+}
+
+// === Initialization ===
+document.addEventListener('DOMContentLoaded', () => {
+  const barsContainer = document.getElementById('color-bars');
+  const panelsContainer = document.getElementById('panels-column');
+
+  for (let i = 0; i < 4; i++) {
+    // Create color bar
+    const bar = document.createElement('div');
+    bar.className = 'color-bar';
+    bar.id = 'bar-' + i;
+    const label = document.createElement('span');
+    label.className = 'color-bar-label';
+    label.textContent = 'Col' + (i + 1);
+    bar.appendChild(label);
+    barsContainer.appendChild(bar);
+
+    // Create panel
+    const panel = new ColorPanel(i);
+    panels.push(panel);
+    panelsContainer.appendChild(panel.el);
+  }
+
+  // Initial render
+  panels.forEach(p => p.render());
+});
+</script>
+</body>
+</html>
