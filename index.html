@@ -1,0 +1,1335 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio — 言葉とデザインで、伝えたいことを形にします。</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    /* ==============================
+       Reset & Base
+    ============================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      font-size: 15px;
+      line-height: 1.8;
+      color: #333;
+      background: #fff;
+    }
+
+    /* ==============================
+       Variables
+    ============================== */
+    :root {
+      --accent: #3B9ED4;
+      --accent-light: #d0eaf8;
+      --accent-dark: #2a7fb0;
+      --red: #C0392B;
+      --gray-bg: #F5F5F5;
+      --gray-border: #ddd;
+      --text: #333;
+      --text-light: #666;
+      --white: #fff;
+      --nav-height: 60px;
+    }
+
+    /* ==============================
+       Navigation
+    ============================== */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: var(--nav-height);
+      background: var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      z-index: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    .nav-logo {
+      color: var(--white);
+      font-weight: 700;
+      font-size: 16px;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 6px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: rgba(255,255,255,0.9);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+      padding: 6px 12px;
+      border-radius: 4px;
+      transition: background 0.2s;
+    }
+
+    .nav-links a:hover {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+    }
+
+    /* hamburger (mobile) */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      background: none;
+      border: none;
+      padding: 4px;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 24px;
+      height: 2px;
+      background: #fff;
+      border-radius: 2px;
+      transition: 0.3s;
+    }
+
+    @media (max-width: 640px) {
+      .nav-links {
+        display: none;
+        position: absolute;
+        top: var(--nav-height);
+        left: 0;
+        right: 0;
+        background: var(--accent-dark);
+        flex-direction: column;
+        padding: 12px 0;
+        gap: 0;
+      }
+      .nav-links.open {
+        display: flex;
+      }
+      .nav-links a {
+        padding: 12px 24px;
+        border-radius: 0;
+        font-size: 15px;
+      }
+      .nav-hamburger {
+        display: flex;
+      }
+    }
+
+    /* ==============================
+       Section Layout
+    ============================== */
+    section {
+      padding: 80px 0 64px;
+    }
+
+    section:first-of-type {
+      padding-top: calc(var(--nav-height) + 60px);
+    }
+
+    .section-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    .section-alt {
+      background: var(--gray-bg);
+    }
+
+    /* ==============================
+       Section Heading
+    ============================== */
+    .section-heading {
+      font-size: 26px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      display: inline-block;
+      border-bottom: 3px solid var(--accent);
+      padding-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .section-lead {
+      font-size: 14px;
+      color: var(--text-light);
+      margin-bottom: 40px;
+      margin-top: 4px;
+    }
+
+    /* ==============================
+       Image Placeholder
+    ============================== */
+    .img-placeholder {
+      background: #e8e8e8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #999;
+      font-size: 13px;
+      border-radius: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    /* 実画像共通スタイル */
+    .work-card-thumb,
+    .logo-card-img,
+    .stamp-img,
+    .manga-poster-img,
+    .special-card-img {
+      width: 100%;
+      display: block;
+      border-radius: 0;
+    }
+    .work-card-thumb  { height: 180px; object-fit: cover; object-position: top center; }
+    .logo-card-img    { height: 280px; object-fit: contain; background: #f9f9f9; padding: 20px; }
+    .stamp-img        { height: 260px; object-fit: contain; background: #f9f9f9; padding: 12px; }
+    /* マンガ・ポスター・インフォ・分解図は全体表示 */
+    .manga-poster-img { height: auto; object-fit: unset; display: block; }
+    .special-card-img { height: auto; object-fit: unset; display: block; }
+
+    /* 拡大ボタン */
+    .expand-btn {
+      display: inline-block;
+      margin-top: 10px;
+      padding: 6px 16px;
+      background: var(--gray-bg);
+      border: 1px solid var(--gray-border);
+      border-radius: 4px;
+      font-size: 12px;
+      color: var(--accent-dark);
+      text-decoration: none;
+      font-weight: 500;
+      transition: background 0.2s;
+    }
+    .expand-btn:hover { background: var(--accent-light); }
+
+    /* 全文・全スライドリンクボタン */
+    .view-btn {
+      display: inline-block;
+      margin-top: 14px;
+      padding: 9px 20px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 5px;
+      font-size: 13px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+    .view-btn:hover { opacity: 0.82; }
+    .view-btn-outline {
+      background: #fff;
+      color: var(--accent-dark);
+      border: 2px solid var(--accent);
+    }
+
+    /* Google Sites 埋め込み想定プレビュー枠 */
+    .slides-embed-note {
+      background: #e8f5fd;
+      border: 1px dashed var(--accent);
+      border-radius: 8px;
+      padding: 18px 20px;
+      margin-top: 12px;
+      font-size: 13px;
+      color: var(--accent-dark);
+      line-height: 1.7;
+    }
+    .slides-embed-note strong { font-weight: 700; }
+
+    /* ==============================
+       こだわりポイント Block
+    ============================== */
+    .kodawari {
+      background: var(--gray-bg);
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 6px 6px 0;
+      margin-top: 16px;
+    }
+
+    .kodawari-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+
+    .kodawari p {
+      font-size: 13px;
+      line-height: 1.75;
+      color: #555;
+    }
+
+    /* ==============================
+       #home
+    ============================== */
+    #home {
+      background: linear-gradient(160deg, #fff 60%, #e8f5fd 100%);
+    }
+
+    .home-hero {
+      text-align: center;
+      padding: 40px 0 48px;
+    }
+
+    .home-tagline {
+      font-size: clamp(22px, 4vw, 34px);
+      font-weight: 700;
+      color: var(--text);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .home-tagline span {
+      color: var(--accent);
+    }
+
+    .home-intro {
+      font-size: 15px;
+      color: var(--text-light);
+      line-height: 1.9;
+      max-width: 600px;
+      margin: 0 auto 40px;
+    }
+
+    .home-cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-top: 16px;
+    }
+
+    @media (max-width: 640px) {
+      .home-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .home-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      padding: 24px 20px;
+      text-align: center;
+      text-decoration: none;
+      color: var(--text);
+      transition: box-shadow 0.2s, transform 0.2s;
+      display: block;
+    }
+
+    .home-card:hover {
+      box-shadow: 0 6px 20px rgba(59,158,212,0.15);
+      transform: translateY(-3px);
+    }
+
+    .home-card-icon {
+      width: 48px;
+      height: 48px;
+      background: var(--accent-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 14px;
+      font-size: 22px;
+    }
+
+    .home-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: var(--accent-dark);
+    }
+
+    .home-card-desc {
+      font-size: 12px;
+      color: var(--text-light);
+      line-height: 1.7;
+    }
+
+    /* ==============================
+       #writing
+    ============================== */
+    .writing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      margin-bottom: 40px;
+    }
+
+    @media (max-width: 680px) {
+      .writing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* writing-grid 内でフル幅に広げるカード */
+    .work-card-full {
+      grid-column: 1 / -1;
+    }
+    /* フルwidthカードではサムネイルを全体表示（トリミングなし） */
+    .work-card-full .work-card-thumb {
+      height: auto;
+      object-fit: unset;
+    }
+
+    /* スライドギャラリー */
+    .slide-gallery {
+      margin-top: 16px;
+      border: 1px solid var(--gray-border);
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    .slide-gallery-img {
+      width: 100%;
+      display: block;
+    }
+    .slide-gallery-nav {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      padding: 10px 16px;
+      background: #f7f7f7;
+      border-top: 1px solid var(--gray-border);
+    }
+    .slide-nav-btn {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      cursor: pointer;
+      line-height: 1;
+      transition: background 0.2s;
+    }
+    .slide-nav-btn:hover { background: var(--accent-dark); }
+    .slide-nav-btn:disabled { background: #ccc; cursor: default; }
+    .slide-counter {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-light);
+      min-width: 52px;
+      text-align: center;
+    }
+
+    .work-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .work-card-thumb {
+      width: 100%;
+      height: 180px;
+    }
+
+    .work-card-body {
+      padding: 20px;
+    }
+
+    .work-card-tag {
+      display: inline-block;
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .work-card-title {
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.5;
+    }
+
+    .work-card-desc {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.75;
+    }
+
+    /* ==============================
+       #design
+    ============================== */
+    .design-section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--text);
+      margin: 40px 0 16px;
+      padding-bottom: 4px;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    .design-section-title:first-of-type {
+      margin-top: 0;
+    }
+
+    .logo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 560px) {
+      .logo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .logo-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .logo-card-img {
+      width: 100%;
+      height: 280px;
+    }
+
+    .logo-card-body {
+      padding: 16px 18px 18px;
+    }
+
+    .logo-card-name {
+      font-size: 16px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      color: var(--accent-dark);
+    }
+
+    .logo-card-sub {
+      font-size: 12px;
+      color: var(--text-light);
+      margin-bottom: 10px;
+    }
+
+    .stamp-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .stamp-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stamp-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .stamp-img {
+      width: 100%;
+      height: 260px;
+    }
+
+    .stamp-label {
+      padding: 10px 14px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 6px;
+    }
+
+    .manga-poster-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 560px) {
+      .manga-poster-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .manga-poster-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .manga-poster-img {
+      width: 100%;
+      height: auto;
+    }
+
+    .manga-poster-body {
+      padding: 12px 16px;
+    }
+
+    .manga-poster-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .manga-poster-desc {
+      font-size: 12px;
+      color: var(--text-light);
+      line-height: 1.7;
+    }
+
+    /* ==============================
+       #special
+    ============================== */
+    .special-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+
+    .special-card-img {
+      width: 100%;
+      height: 260px;
+    }
+
+    .special-card-video {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      display: block;
+      background: #000;
+    }
+
+
+    .special-card-body {
+      padding: 20px 24px 24px;
+    }
+
+    .special-card-title {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .special-card-desc {
+      font-size: 13px;
+      color: var(--text-light);
+      line-height: 1.8;
+    }
+
+    /* ==============================
+       #profile
+    ============================== */
+    .profile-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 40px;
+      align-items: start;
+    }
+
+    @media (max-width: 640px) {
+      .profile-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .profile-avatar {
+      width: 100%;
+      height: 200px;
+      border-radius: 10px;
+    }
+
+    .profile-name {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .profile-tagline {
+      font-size: 13px;
+      color: var(--accent);
+      font-weight: 500;
+      margin-bottom: 16px;
+    }
+
+    .profile-bio {
+      font-size: 14px;
+      color: var(--text-light);
+      line-height: 1.85;
+      margin-bottom: 24px;
+    }
+
+    .profile-list {
+      margin-bottom: 24px;
+    }
+
+    .profile-list-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 8px;
+      letter-spacing: 0.04em;
+    }
+
+    .profile-item {
+      font-size: 13px;
+      color: var(--text-light);
+      padding: 4px 0;
+      border-bottom: 1px dotted #ddd;
+      display: flex;
+      gap: 12px;
+    }
+
+    .profile-item-label {
+      color: var(--accent-dark);
+      font-weight: 500;
+      min-width: 80px;
+      flex-shrink: 0;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 24px;
+    }
+
+    .skill-tag {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      font-size: 12px;
+      font-weight: 500;
+      padding: 4px 12px;
+      border-radius: 20px;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      transition: opacity 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      opacity: 0.85;
+      transform: translateY(-1px);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .btn-secondary {
+      background: var(--white);
+      color: var(--accent-dark);
+      border: 2px solid var(--accent);
+    }
+
+    /* ==============================
+       Footer
+    ============================== */
+    footer {
+      background: #2a2a2a;
+      color: #aaa;
+      text-align: center;
+      padding: 28px 24px;
+      font-size: 13px;
+      letter-spacing: 0.04em;
+    }
+
+    footer span {
+      color: #ccc;
+    }
+
+    /* ==============================
+       Utility
+    ============================== */
+    .mt-0 { margin-top: 0; }
+    .mt-8 { margin-top: 8px; }
+    .mt-16 { margin-top: 16px; }
+    .mt-24 { margin-top: 24px; }
+    .mt-32 { margin-top: 32px; }
+    .mb-0 { margin-bottom: 0; }
+
+    .tag-red {
+      background: #fde8e8;
+      color: var(--red);
+    }
+
+    .tag-green {
+      background: #e8f5e9;
+      color: #2e7d32;
+    }
+
+    .tag-blue {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    /* ==============================
+       #programing
+    ============================== */
+    .programing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 560px) {
+      .programing-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .programing-card {
+      background: var(--white);
+      border: 1px solid var(--gray-border);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .programing-card-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      object-position: top center;
+      display: block;
+      border-bottom: 1px solid var(--gray-border);
+    }
+
+    .programing-card-body {
+      padding: 16px 18px 20px;
+    }
+
+    .highlight-red {
+      color: var(--red);
+      font-weight: 700;
+    }
+
+    .divider {
+      border: none;
+      border-top: 1px solid var(--gray-border);
+      margin: 40px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ==============================
+       Navigation
+  ============================== -->
+  <nav>
+    <a href="#home" class="nav-logo">Portfolio</a>
+    <button class="nav-hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
+    <ul class="nav-links" id="nav-links">
+      <li><a href="#home">Home</a></li>
+      <li><a href="#writing">Writing</a></li>
+      <li><a href="#design">Design</a></li>
+      <li><a href="#programing">Programing</a></li>
+      <li><a href="#special">Special</a></li>
+      <li><a href="#profile">Profile</a></li>
+    </ul>
+  </nav>
+
+  <!-- ==============================
+       #home
+  ============================== -->
+  <section id="home">
+    <div class="section-inner">
+      <div class="home-hero">
+        <h1 class="home-tagline">
+          言葉とデザインで、<br>
+          <span>伝えたいことを形にします。</span>
+        </h1>
+        <p class="home-intro">
+          シナリオ・デザイン・Webアプリ開発・映像制作まで、<br>
+          表現方法を横断して「伝わる表現」を届けるフリーランスクリエイターです。<br>
+          言葉・ビジュアル・コード——3つの武器でクライアントの課題に応えます。
+        </p>
+      </div>
+
+      <div class="home-cards">
+        <a href="#writing" class="home-card">
+          <div class="home-card-icon">✍️</div>
+          <div class="home-card-title">Writing</div>
+          <p class="home-card-desc">YouTubeシナリオ・スライド原稿など、読まれる文章制作</p>
+        </a>
+        <a href="#design" class="home-card">
+          <div class="home-card-icon">🎨</div>
+          <div class="home-card-title">Design</div>
+          <p class="home-card-desc">ロゴ・LINEスタンプ・広告マンガ・ポスターなどビジュアル制作</p>
+        </a>
+        <a href="#programing" class="home-card">
+          <div class="home-card-icon">💻</div>
+          <div class="home-card-title">Programing</div>
+          <p class="home-card-desc">カラーツール・ゲームなどインタラクティブなWebアプリ制作</p>
+        </a>
+        <a href="#special" class="home-card">
+          <div class="home-card-icon">💡</div>
+          <div class="home-card-title">Special Works</div>
+          <p class="home-card-desc">インフォグラフィック・図解など、知識×デザインの作品</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       #writing
+  ============================== -->
+  <section id="writing" class="section-alt">
+    <div class="section-inner">
+      <h2 class="section-heading">Writing</h2>
+      <p class="section-lead">読まれ・聴かれ・共感される文章を設計します。YouTubeシナリオから教育スライドまで、目的に合わせた文体と構成で制作しています。</p>
+
+      <div class="writing-grid">
+        <!-- シナリオ -->
+        <div class="work-card work-card-full">
+          <img src="writing/scenario_01_thumbnail.png" alt="シナリオ：義母の善意に限界が来た日 サムネイル" class="work-card-thumb">
+          <div class="work-card-body">
+            <span class="work-card-tag">YouTube シナリオ</span>
+            <h3 class="work-card-title">義母の"善意"に限界が来た日<br>〜完璧な嫁を演じた5年間〜</h3>
+            <p class="work-card-desc">
+              表向きは「良い関係」を保ちながら、5年にわたって蓄積された義母の善意という名の介入。
+              亡き祖母の形見の食器を「邪魔だから」と捨てられた日、主人公はついに行動に移す。
+              読み上げ音声用・スカッと系シナリオ、全約12,000字の作品例です。
+            </p>
+            <div class="kodawari mt-16">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>セリフの「体言止め」を意図的に多用し、読み上げ音声にリズムが出るように配慮しました。義母の台詞はすべて「善意の言葉」で構成しながら、読み手が理不尽さを感じる表現技法にしています。全体の字数配分を考え、「蓄積パート」が約５割を占めるよう設計することで、カタルシスの強度を最大化しています。</p>
+            </div>
+            <a href="writing/シナリオ_義母の善意.txt" target="_blank" rel="noopener" class="view-btn mt-16">
+              📄 シナリオ全文を読む（テキスト版）
+            </a>
+          </div>
+        </div>
+
+        <!-- スライド -->
+        <div class="work-card work-card-full">
+          <div class="work-card-body">
+            <span class="work-card-tag tag-green">教育スライド</span>
+            <h3 class="work-card-title">40代主婦の副業戦略 2026<br>― 1日2時間・PC1台で月5万円を叶える ―</h3>
+            <p class="work-card-desc">
+              2026年の税制改正（非課税枠178万円引き上げ）を切り口に、副業初心者の40代主婦が
+              「今すぐ始められる」5種の収益モデルを解説する全15枚の講義スライドです。
+              Webライター・SNS運用代行・オンライン秘書・AIデータ検証・スキルシェアを
+              収益目標・優位性・活用ツール別に整理しています。3ヶ月ロードマップと
+              無料AIツール（ChatGPT・Claude・Canva等）の活用法にも触れています。
+            </p>
+            <div class="kodawari mt-16">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>2026年特有の「3つの追い風」（税制改正・AI革命・人手不足）という外部環境から始めることで、受講者が行動に踏み出す心理的障壁を下げる設計にしました。各副業スライドでは「40代主婦ならではの優位性」を必ず明示し、「私にもできるかも」と思ってもらえる構成にしました。AIツールは5種を用途別に整理して情報過多を防ぎ、3ヶ月のロードマップで月5万円というゴールを具体的に描かせることで「今日から始める」決断を後押しするスライドにしています。</p>
+            </div>
+            <div class="slide-gallery mt-16">
+              <img id="slide-img" src="writing/slides/slide_01.png" alt="スライド 1/15" class="slide-gallery-img">
+              <div class="slide-gallery-nav">
+                <button class="slide-nav-btn" id="slide-prev" onclick="slideNav(-1)" disabled>&#8592;</button>
+                <span class="slide-counter" id="slide-counter">1 / 15</span>
+                <button class="slide-nav-btn" id="slide-next" onclick="slideNav(1)">&#8594;</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       #design
+  ============================== -->
+  <section id="design">
+    <div class="section-inner">
+      <h2 class="section-heading">Design</h2>
+      <p class="section-lead">ロゴ・スタンプ・マンガ・ポスターなど、ブランドの「顔」をつくるビジュアル制作を手がけています。見た目の美しさだけでなく、目的・媒体・受け手を考慮したデザインを心がけています。</p>
+
+      <!-- ロゴ -->
+      <h3 class="design-section-title">ロゴデザイン</h3>
+      <div class="logo-grid">
+        <div class="logo-card">
+          <img src="design/logo_racine_color.png" alt="Racine オーガニックカフェ ロゴ" class="logo-card-img">
+          <div class="logo-card-body">
+            <div class="logo-card-name">Racine</div>
+            <div class="logo-card-sub">オーガニック系カフェ / ブランドロゴ</div>
+            <p style="font-size:13px; color:#555; line-height:1.75;">
+              「根」を意味するフランス語をベースに、土・光・植物をモチーフとした温かみのあるメダリオン型ロゴ。
+              テラコッタ・クリーム・グリーンの3色で自然との繋がりを表現しました。
+            </p>
+            <div class="kodawari mt-12">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>テラコッタ・クリーム・グリーンを「土・光・植物」のメタファーとして選定し、色だけでブランドイメージを表現しました。メダリオン内のリーフ数を奇数（5枚）にすることで、左右対称にしながら自然な非対称感を演出しました。モノクロ版を最初から設計に組み込み、スタンプや領収書への適用もブランドイメージを損なわずスムーズです。</p>
+            </div>
+            <a href="design/logo_racine_color.png" target="_blank" class="expand-btn mt-16">🔍 拡大して見る</a>
+          </div>
+        </div>
+
+        <div class="logo-card">
+          <img src="design/logo_syncra_color.png" alt="Syncra テックスタートアップ ロゴ" class="logo-card-img">
+          <div class="logo-card-body">
+            <div class="logo-card-name">Syncra</div>
+            <div class="logo-card-sub">テック系スタートアップ / コーポレートロゴ</div>
+            <p style="font-size:13px; color:#555; line-height:1.75;">
+              チームの集結・連携をコンセプトに、6つのノードが中心へ引き寄せられる幾何学的シンボル。
+              BtoB向けながら全小文字ロゴタイプで親しみやすさを表現しました。
+            </p>
+            <div class="kodawari mt-12">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>6つのノードをわずかに中心へ引き寄せた配置で「集結力・凝集」というコーポレートコンセプトを表現してみました。faviconサイズ（16×16px）でもシンボルが認識できるかを確認し、太さを調整しています。</p>
+            </div>
+            <a href="design/logo_syncra_color.png" target="_blank" class="expand-btn mt-16">🔍 拡大して見る</a>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- LINEスタンプ -->
+      <h3 class="design-section-title">LINEスタンプ</h3>
+      <div class="stamp-grid">
+        <div class="stamp-card">
+          <img src="design/stamp_raccoon.png" alt="できる！アライグマくんのビジネス敬語スタンプ" class="stamp-img">
+          <div class="stamp-label">
+            できる！「ビジネス アライグマ」くんの敬語スタンプ（全8種）
+            <a href="design/stamp_raccoon.png" target="_blank" class="expand-btn" style="display:inline-block; margin-top:8px;">🔍 拡大して見る</a>
+          </div>
+        </div>
+        <div class="stamp-card">
+          <img src="design/stamp_housewife.png" alt="主婦のリアル共感スタンプ〜今日も生きてる〜" class="stamp-img">
+          <div class="stamp-label">
+            主婦のリアル共感スタンプ〜今日も生きてる〜（全8種）
+            <a href="design/stamp_housewife.png" target="_blank" class="expand-btn" style="display:inline-block; margin-top:8px;">🔍 拡大して見る</a>
+          </div>
+        </div>
+      </div>
+
+      <hr class="divider">
+
+      <!-- 広告マンガ・ポスター -->
+      <h3 class="design-section-title">広告マンガ・広告ポスター</h3>
+      <div class="manga-poster-grid">
+        <div class="manga-poster-card">
+          <img src="design/manga_backpain.png" alt="広告マンガ 腰が変わると、人生が変わる。" class="manga-poster-img">
+          <div class="manga-poster-body">
+            <div class="manga-poster-title">広告マンガ（全7コマ）「腰が変わると、人生が変わる。」</div>
+            <p class="manga-poster-desc">腰痛サポーター向け広告マンガ。Before/After を7コマで自然に表現。商品名は最終コマに大きく登場させ、物語への没入感を大切にしました。</p>
+            <a href="design/manga_backpain.png" target="_blank" class="expand-btn">🔍 拡大して見る</a>
+          </div>
+        </div>
+        <div class="manga-poster-card">
+          <img src="design/poster_parasol.png" alt="広告ポスター SHADE THE STRONG 男性用日傘" class="manga-poster-img">
+          <div class="manga-poster-body">
+            <div class="manga-poster-title">広告ポスター「SHADE THE STRONG」男性用日傘</div>
+            <p class="manga-poster-desc">「日傘を差す男性は格好悪い」という偏見を払拭するように、「賢い男は自分を守る」を訴求。キャッチコピー「涼しさは、戦略だ。」でスタイリッシュに訴求するビジュアルポスターに仕上げました。</p>
+            <a href="design/poster_parasol.png" target="_blank" class="expand-btn">🔍 拡大して見る</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       #programing
+  ============================== -->
+  <section id="programing" class="section-alt">
+    <div class="section-inner">
+      <h2 class="section-heading">Programing</h2>
+      <p class="section-lead">デザインの知識とコーディングを掛け合わせたWebアプリケーションです。見た目の使いやすさにこだわり、ちょっと役立つ・ちょっと楽しいインタラクティブな体験を届けます。</p>
+
+      <div class="programing-grid">
+
+        <!-- ColorPanel -->
+        <div class="programing-card">
+          <img src="programing/ColorPanel/thumbnail.png" alt="Color Panel Viewer スクリーンショット" class="programing-card-img">
+          <div class="programing-card-body">
+            <span class="work-card-tag tag-blue">Webアプリ</span>
+            <h3 class="work-card-title">カラーパレット比較ツール<br>「Color Palette Viewer」</h3>
+            <p class="work-card-desc">
+              4色のカラーコードを自由に設定し、配色を比較できるカラービューア。
+              RGB・HSL・Hexによる入力、スペクトラム上での直感的なピッキング、
+              縦並びと同心円表示で配色を確認できる。<h4>「この色とあの色を並べると
+              どう見える？」</h4>という疑問を即座に解決するデザイン補助ツールです。
+            </p>
+            <div class="kodawari mt-16">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>同心円ビューで4色を配置し、配色の優先順位や対比を直感的に確認できるよう設計しました。RGB・HSL・Hex値をリアルタイムで連動させ、操作に柔軟性を持たせています。少し難しいことを言うと このアプリはHTMLファイル１本で書いています。インストーラ不要、好きな場所に置いてWebブラウザだけで開くことが出来ます。</p>
+            </div>
+            <a href="programing/ColorPanel/ColorPanel.html" target="_blank" rel="noopener" class="view-btn mt-16">▶ アプリを開く</a>
+          </div>
+        </div>
+
+        <!-- Concentration -->
+        <div class="programing-card">
+          <img src="programing/Concentration/thumbnail.png" alt="神経衰弱 ビジネスアライグマ スクリーンショット" class="programing-card-img">
+          <div class="programing-card-body">
+            <span class="work-card-tag tag-blue">Webゲーム</span>
+            <h3 class="work-card-title">神経衰弱ゲーム<br>「ビジネスアライグマ」</h3>
+            <p class="work-card-desc">
+              このページのDesign セクションで紹介している LINEスタンプ「ビジネスアライグマ」8種類を
+              カード絵柄に採用した4×4の神経衰弱ゲーム。3Dフリップアニメーション、
+              マッチ時のエフェクト、ミス時のシェイクを実装しました。
+              手数・時間・スコアを結果表示し、友達と競ったり
+              今の集中力を確かめる指標にもなる設計にしました。
+            </p>
+            <div class="kodawari mt-16">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>スコアは「8手・60秒でパーフェクト1000点」になるように計算し、速さと正確さの両方がバランス評価されるようにしました。カードのフリップはCSSの3Dトランスフォームで実装し、マッチ時のエフェクト・失敗時のシェイクで視覚的フィードバックを表現しました。Design セクションのLINEスタンプをゲームの絵柄に使うことでポートフォリオの一体感を表しました。</p>
+            </div>
+            <a href="programing/Concentration/concentration.html" target="_blank" rel="noopener" class="view-btn mt-16">▶ ゲームを開く</a>
+          </div>
+        </div>
+
+        <!-- WarikanJaws -->
+        <div class="programing-card">
+          <img src="programing/WarikanJaws/thumbnail.png" alt="ワリカン上手 スクリーンショット" class="programing-card-img">
+          <div class="programing-card-body">
+            <span class="work-card-tag tag-blue">Webアプリ</span>
+            <h3 class="work-card-title">割り勘計算ツール<br>「ワリカン上手」</h3>
+            <p class="work-card-desc">
+              食事会の会計を男女別にワリカン計算するツール。
+              負担割合スライダーで男女の支払い比率を自由に調整でき 
+              100円・10円単位の丸め選択にも対応。
+              端数が最小になる組み合わせを自動で算出し、
+              幹事の<h4> 「切りのいい金額にならないかな～」</h4>に応えます。<br>
+              『野郎ども 男気をみせてみろ～～！』(笑)
+            </p>
+            <div class="kodawari mt-16">
+              <div class="kodawari-label">こだわりポイント</div>
+              <p>単純に割り算するだけでなく、切り上げ・切り捨ての組み合わせを全通り試して「端数が最も小さくなる計算パターン」を自動選択する仕組みにしました。負担割合スライダーは男性（紺）女性（ベージュ）の横棒で比率をリアルタイムに視覚化し、直感的に操作できるように工夫しました。このアプリもHTMLファイル１本で書いています。インストーラ不要、好きな場所に置いてWebブラウザだけで開くことが出来ます。</p>
+            </div>
+            <a href="programing/WarikanJaws/WarikanJaws.html" target="_blank" rel="noopener" class="view-btn mt-16">▶ アプリを開く</a>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       #special
+  ============================== -->
+  <section id="special" class="section-alt">
+    <div class="section-inner">
+      <h2 class="section-heading">Special Works</h2>
+      <p class="section-lead">「複雑な情報を、見て一瞬でわかる形に変換する」ことが得意です。調査力・構成力・ビジュアライズ力を掛け合わせた、知識×デザインの作品群です。</p>
+
+      <!-- インフォグラフィック -->
+      <div class="special-card">
+        <img src="special/infographic_nuclear.png" alt="インフォグラフィック 核分裂 vs 核融合" class="special-card-img">
+        <div class="special-card-body">
+          <h3 class="special-card-title">インフォグラフィック「核分裂 vs 核融合」</h3>
+          <p class="special-card-desc">
+            2種類の核エネルギー技術を、仕組み・発電量・安全性・燃料・実用化などで比較する
+            インフォグラフィック。2026年現在地をタイムラインでピン表示し、
+            「今どの段階にいるか」を一目で把握できるようにしました。
+          </p>
+          <div class="kodawari mt-16">
+            <div class="kodawari-label">こだわりポイント</div>
+            <p>核分裂（オレンジ系）と核融合（ブルー系）の色分けをエネルギーのイメージ（熱・炎 vs 水・宇宙）から選定しました。比較項目を「仕組み→発電量→安全性→燃料→実用化」という思考の流れに沿って配置しました。</p>
+          </div>
+          <a href="special/infographic_nuclear.png" target="_blank" class="expand-btn mt-16">🔍 拡大して見る（原寸）</a>
+        </div>
+      </div>
+
+      <!-- タイムマシン分解図 -->
+      <div class="special-card">
+        <img src="special/timemachine_diagram.png" alt="TEMPORAL VOYAGER TYPE-∞ タイムマシン分解図" class="special-card-img">
+        <div class="special-card-body">
+          <h3 class="special-card-title">タイムマシン構想図</h3>
+          <p class="special-card-desc">
+            ユーモラスな架空の乗り物「タイムマシン」を、ビジュアル言語で描いた
+            図解作品。「ジョークを本気で描く」を表現しています。
+          </p>
+          <div class="kodawari mt-16">
+            <div class="kodawari-label">こだわりポイント</div>
+            <p>タイムトラベルSFの定番ネタ（バタフライ効果、祖父のパラドックス）を、ボロいトラックの「実在する部品」に一つずつ対応させました。すべてのギャグが「車のパーツとして機能的に正しい位置」に配置されていて、ばかばかしいのに妙に説得力がある。絵のクオリティが高いぶん、内容のギャグとの落差を際立たせました。</p>
+          </div>
+          <a href="special/timemachine_diagram.png" target="_blank" class="expand-btn mt-16">🔍 拡大して見る（原寸）</a>
+        </div>
+      </div>
+
+      <!-- THE SAND MAN 動画 -->
+      <div class="special-card mb-0">
+        <video
+          src="special/portfolio_video.mp4"
+          poster="special/video_image.png"
+          controls
+          class="special-card-video">
+        </video>
+        <div class="special-card-body">
+          <h3 class="special-card-title">THE SAND MAN 動画</h3>
+          <p class="special-card-desc">
+            静寂の中から砂嵐が発生し巨大化、巨人が覚醒するVFX映像作品。
+            映像と音響編集を組み合わせ、「無音→轟音」という音の対比で
+            映像の迫力を最大化しました。
+          </p>
+          <div class="kodawari mt-16">
+            <div class="kodawari-label">こだわりポイント</div>
+            <p>冒頭の音量を抑えることで、視聴者に「何も起きていない」という安心感を与えてから一気に音を解放する設計にしました（"SILENCE TO CHAOS"）。サムネイルは「砂が渦を巻きながら巨人が覚醒する瞬間」を切り取り、クリックしたくなる構図と文字レイアウトを意識しました。</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       #profile
+  ============================== -->
+  <section id="profile">
+    <div class="section-inner">
+      <h2 class="section-heading">Profile</h2>
+      <p class="section-lead">フリーランスクリエイターとして、ライティング・デザイン・Webアプリ開発・映像制作まで幅広く活動しています。</p>
+
+      <div class="profile-grid">
+        <div>
+          <img src="design/profile_image.png" alt="プロフィール写真" class="profile-avatar" style="object-fit: cover;">
+        </div>
+        <div>
+          <div class="profile-name">masashi_digicre</div>
+          <div class="profile-tagline">AI活用 ライター ／ デザイナー ／ クリエイター</div>
+          <p class="profile-bio">
+            「伝わる言葉」「届くデザイン」「動くプロダクト」を手がけるフリーランスクリエイター。<br>
+            YouTubeシナリオ・ロゴデザイン・HP制作・Webアプリ開発・映像制作まで幅広く対応。<br>
+            「複雑な情報をシンプルに」「見て一瞬でわかる形に」を制作指針としています。
+          </p>
+
+          <div class="profile-list">
+            <div class="profile-list-title">経歴・スペック</div>
+            <div class="profile-item">
+              <span class="profile-item-label">活動歴</span>
+              <span>フリーランス歴 1年／ライティング・デザイン並行</span>
+            </div>
+            <div class="profile-item">
+              <span class="profile-item-label">稼働時間</span>
+              <span>平日 9:00〜17:00（週4〜5日、応相談）</span>
+            </div>
+            <div class="profile-item">
+              <span class="profile-item-label">対応形式</span>
+              <span>単発依頼・継続契約どちらも対応可</span>
+            </div>
+            <div class="profile-item">
+              <span class="profile-item-label">使用ツール</span>
+              <span>Canva / DaVinci Resolve / GIMP / Claude / Gemini / Stable Diffusion / HTML・CSS・JS / Google Slides / Excel / PowerPoint</span>
+            </div>
+            <div class="profile-item">
+              <span class="profile-item-label">得意ジャンル</span>
+              <span>スカッと系・実話系シナリオ、教育コンテンツ、BtoCブランドロゴ、インタラクティブWebアプリ</span>
+            </div>
+          </div>
+
+          <div class="profile-list-title" style="font-size:13px;font-weight:700;margin-bottom:10px;">スキル</div>
+          <div class="skill-tags">
+            <span class="skill-tag">シナリオライティング</span>
+            <span class="skill-tag">スライドデザイン</span>
+            <span class="skill-tag">ロゴデザイン</span>
+            <span class="skill-tag">インフォグラフィック</span>
+            <span class="skill-tag">LINEスタンプ</span>
+            <span class="skill-tag">広告マンガ</span>
+            <span class="skill-tag">Webアプリ開発</span>
+            <span class="skill-tag">HTML・CSS・JavaScript</span>
+            <span class="skill-tag">映像制作</span>
+            <span class="skill-tag">Canva</span>
+            <span class="skill-tag">Google Slides</span>
+            <span class="skill-tag">AI活用</span>
+          </div>
+
+          <div class="btn-row">
+ <!--       <a href="https://www.lancers.jp/" target="_blank" rel="noopener" class="btn btn-primary">ランサーズで依頼する</a>          -->
+ <!--       <a href="https://crowdworks.jp/" target="_blank" rel="noopener" class="btn btn-secondary">クラウドワークスで依頼する</a>   -->
+            <a href="https://crowdworks.jp/" target="_blank" rel="noopener" class="btn btn-primary">クラウドワークスで依頼する</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==============================
+       Footer
+  ============================== -->
+  <footer>
+    <span>© 2026 CyberPolaris</span> — All rights reserved.
+  </footer>
+
+  <!-- ==============================
+       Script: hamburger menu
+  ============================== -->
+  <!-- スライドギャラリー ナビゲーション -->
+  <script>
+    var _slideIdx = 1;
+    var _slideTotal = 15;
+    function slideNav(dir) {
+      _slideIdx = Math.max(1, Math.min(_slideTotal, _slideIdx + dir));
+      var pad = String(_slideIdx).padStart(2, '0');
+      document.getElementById('slide-img').src = 'writing/slides/slide_' + pad + '.png';
+      document.getElementById('slide-img').alt = 'スライド ' + _slideIdx + '/' + _slideTotal;
+      document.getElementById('slide-counter').textContent = _slideIdx + ' / ' + _slideTotal;
+      document.getElementById('slide-prev').disabled = (_slideIdx === 1);
+      document.getElementById('slide-next').disabled = (_slideIdx === _slideTotal);
+    }
+  </script>
+
+  <script>
+    const hamburger = document.getElementById('hamburger');
+    const navLinks = document.getElementById('nav-links');
+
+    hamburger.addEventListener('click', () => {
+      navLinks.classList.toggle('open');
+    });
+
+    // close menu when a link is clicked
+    navLinks.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        navLinks.classList.remove('open');
+      });
+    });
+  </script>
+
+</body>
+</html>
